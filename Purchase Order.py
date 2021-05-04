@@ -1,7 +1,6 @@
 import xmlrpc.client
-import json
 
-db = 'soluciones'
+db = 'soluciones-test'
 username = 'soluciones@bbinco.com'
 password = 'Bbinco1.0'
 url = 'http://soluciones.odoo.com'
@@ -20,13 +19,7 @@ ids = models.execute_kw(db, uid, password, 'purchase.order', 'search', [[['name'
 
 document = models.execute_kw(db, uid, password, 'purchase.order', 'read', [ids], {'fields': ['id']})
 
-
-
 document = document[-1]
-#print(jsonToPython['id'])
-
-#document = document[1:]
-
 
 print(document)
 

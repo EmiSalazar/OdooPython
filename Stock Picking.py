@@ -11,7 +11,6 @@ uid = common.authenticate(db, username, password, {})
 
 models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))
 
-#print(models)
 
 print("Ingrese el nombre del documento a editar:")
 busqueda = input()
@@ -117,9 +116,7 @@ document = models.execute_kw(db, uid, password, 'stock.picking', 'read', [ids], 
                                                                                             })
 
 document = document[-1]
-#print(jsonToPython['id'])
 
-#document = document[1:]
 
 
 print(document)
