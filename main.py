@@ -22,8 +22,7 @@ class Editor(Frame):
 
     def __init__(self, master, *args, **kwargs):
         Frame.__init__(self, master, *args, **kwargs)
-        self.label = Label(self, font=("Arial", 24), relief=RAISED, justify=CENTER, bg='white', fg='black',
-                           borderwidth=0, text="Editar:")
+        self.label = Label(self, font=("Arial", 24), relief=RAISED, justify=CENTER, bg='white', fg='black', borderwidth=0, text="      ")
         self.stockButton = Button(self, font=("Arial", 12), fg='black', text="Inventario", highlightbackground='black',
                                   command=lambda: self.Stock_Picking())
         self.purchaseButton = Button(self, font=("Arial", 12), fg='black', text="Orden de Compra",
@@ -64,15 +63,15 @@ class Editor(Frame):
             self.stock = False
             self.stockButton['state'] = tkinter.NORMAL
 
-        self.Pruduct_Template_Rad1 = Radiobutton(self, text='Consumible', value="consu", variable=selected)
-        self.Pruduct_Template_Rad2 = Radiobutton(self, text='Servicio', value="service", variable=selected)
-        self.Pruduct_Template_Rad3 = Radiobutton(self, text='Almacenable', value="product", variable=selected)
+        self.Pruduct_Template_Rad1 = Radiobutton(self, state=DISABLED, text='Consumible', value="consu", variable=selected)
+        self.Pruduct_Template_Rad2 = Radiobutton(self, state=DISABLED, text='Servicio', value="service", variable=selected)
+        self.Pruduct_Template_Rad3 = Radiobutton(self, state=DISABLED, text='Almacenable', value="product", variable=selected)
 
         self.Pruduct_Template_Rad1.grid(column=2, row=1)
         self.Pruduct_Template_Rad2.grid(column=2, row=2)
         self.Pruduct_Template_Rad3.grid(column=2, row=3)
 
-        self.Pruduct_Template_Search_Box = Entry(self, width=10)
+        self.Pruduct_Template_Search_Box = Entry(self, width=25)
         self.Pruduct_Template_Search_Box.grid(column=2, row=0)
 
         self.Pruduct_Template_Search_Button = Button(self, font=("Arial", 12), fg='black', text="Buscar",
@@ -81,7 +80,7 @@ class Editor(Frame):
                                                          self.Pruduct_Template_Search_Box.get()))
         self.Pruduct_Template_Search_Button.grid(row=0, column=3, sticky="nsew")
 
-        self.Pruduct_Template_Save_Button = Button(self, font=("Arial", 12), fg='black', text="Guardar",
+        self.Pruduct_Template_Save_Button = Button(self, state=DISABLED, font=("Arial", 12), fg='black', text="Guardar",
                                                    highlightbackground='black',
                                                    command=lambda: models.execute_kw(db, uid, password,
                                                                                      'product.template', 'write',
@@ -96,6 +95,11 @@ class Editor(Frame):
 
         self.document = self.document[-1]
         print(self.document)
+        if self.document['id'] != "":
+            self.Pruduct_Template_Rad1['state'] = tkinter.NORMAL
+            self.Pruduct_Template_Rad2['state'] = tkinter.NORMAL
+            self.Pruduct_Template_Rad3['state'] = tkinter.NORMAL
+            self.Pruduct_Template_Save_Button['state'] = tkinter.NORMAL
 
     def Purchase_Order(self):
         selected = StringVar()
@@ -126,12 +130,12 @@ class Editor(Frame):
             self.product = False
             self.productButton['state'] = tkinter.NORMAL
 
-        self.Purchase_Order_Rad1 = Radiobutton(self, text='Borrador', value="draft", variable=selected)
-        self.Purchase_Order_Rad2 = Radiobutton(self, text='Solicitud de ppto.', value="sent", variable=selected)
-        self.Purchase_Order_Rad3 = Radiobutton(self, text='Para aprobar', value="to approve", variable=selected)
-        self.Purchase_Order_Rad4 = Radiobutton(self, text='Pedido de compra', value="purchase", variable=selected)
-        self.Purchase_Order_Rad5 = Radiobutton(self, text='Bloqueado', value="done", variable=selected)
-        self.Purchase_Order_Rad6 = Radiobutton(self, text='Cancelado', value="cancel", variable=selected)
+        self.Purchase_Order_Rad1 = Radiobutton(self, state=DISABLED, text='Borrador', value="draft", variable=selected)
+        self.Purchase_Order_Rad2 = Radiobutton(self, state=DISABLED, text='Solicitud de ppto.', value="sent", variable=selected)
+        self.Purchase_Order_Rad3 = Radiobutton(self, state=DISABLED, text='Para aprobar', value="to approve", variable=selected)
+        self.Purchase_Order_Rad4 = Radiobutton(self, state=DISABLED, text='Pedido de compra', value="purchase", variable=selected)
+        self.Purchase_Order_Rad5 = Radiobutton(self, state=DISABLED, text='Bloqueado', value="done", variable=selected)
+        self.Purchase_Order_Rad6 = Radiobutton(self, state=DISABLED, text='Cancelado', value="cancel", variable=selected)
 
         self.Purchase_Order_Rad1.grid(column=2, row=1)
         self.Purchase_Order_Rad2.grid(column=2, row=2)
@@ -140,7 +144,7 @@ class Editor(Frame):
         self.Purchase_Order_Rad5.grid(column=2, row=5)
         self.Purchase_Order_Rad5.grid(column=2, row=6)
 
-        self.Purchase_Order_Search_Box = Entry(self, width=10)
+        self.Purchase_Order_Search_Box = Entry(self, width=25)
         self.Purchase_Order_Search_Box.grid(column=2, row=0)
 
         self.Purchase_Order_Search_Button = Button(self, font=("Arial", 12), fg='black', text="Buscar",
@@ -148,7 +152,7 @@ class Editor(Frame):
                                                    command=lambda: self.Search_Purchase_Order(self.Purchase_Order_Search_Box.get()))
         self.Purchase_Order_Search_Button.grid(row=0, column=3, sticky="nsew")
 
-        self.Purchase_Order_Save_Button = Button(self, font=("Arial", 12), fg='black', text="Guardar",
+        self.Purchase_Order_Save_Button = Button(self, state=DISABLED, font=("Arial", 12), fg='black', text="Guardar",
                                                  highlightbackground='black',
                                                  command=lambda: models.execute_kw(db, uid, password, 'purchase.order', 'write', [[int(self.document['id'])], {'state': selected.get()}]))
         self.Purchase_Order_Save_Button.grid(row=7, column=2, sticky="nsew")
@@ -159,6 +163,14 @@ class Editor(Frame):
         self.document = models.execute_kw(db, uid, password, 'purchase.order', 'read', [ids], {'fields': ['id']})
         print(self.document)
         self.document = self.document[-1]
+        if self.document['id'] != "":
+            self.Purchase_Order_Rad1['state'] = tkinter.NORMAL
+            self.Purchase_Order_Rad2['state'] = tkinter.NORMAL
+            self.Purchase_Order_Rad3['state'] = tkinter.NORMAL
+            self.Purchase_Order_Rad4['state'] = tkinter.NORMAL
+            self.Purchase_Order_Rad5['state'] = tkinter.NORMAL
+            self.Purchase_Order_Rad6['state'] = tkinter.NORMAL
+            self.Purchase_Order_Save_Button['state'] = tkinter.NORMAL
 
     def Stock_Picking(self):
         selected = StringVar()
@@ -189,11 +201,11 @@ class Editor(Frame):
             self.product = False
             self.productButton['state'] = tkinter.NORMAL
 
-        self.Stock_Picking_Rad1 = Radiobutton(self, text='Borrador', value="draft", variable=selected)
-        self.Stock_Picking_Rad2 = Radiobutton(self, text='En Espera', value="confirmed", variable=selected)
-        self.Stock_Picking_Rad3 = Radiobutton(self, text='Preparado', value="assigned", variable=selected)
-        self.Stock_Picking_Rad4 = Radiobutton(self, text='Hecho', value="done", variable=selected)
-        self.Stock_Picking_Rad5 = Radiobutton(self, text='Cancelado', value="cancel", variable=selected)
+        self.Stock_Picking_Rad1 = Radiobutton(self, state=DISABLED, text='Borrador', value="draft", variable=selected)
+        self.Stock_Picking_Rad2 = Radiobutton(self, state=DISABLED, text='En Espera', value="confirmed", variable=selected)
+        self.Stock_Picking_Rad3 = Radiobutton(self, state=DISABLED, text='Preparado', value="assigned", variable=selected)
+        self.Stock_Picking_Rad4 = Radiobutton(self, state=DISABLED, text='Hecho', value="done", variable=selected)
+        self.Stock_Picking_Rad5 = Radiobutton(self, state=DISABLED, text='Cancelado', value="cancel", variable=selected)
 
         self.Stock_Picking_Rad1.grid(column=2, row=1)
         self.Stock_Picking_Rad2.grid(column=2, row=2)
@@ -201,21 +213,17 @@ class Editor(Frame):
         self.Stock_Picking_Rad4.grid(column=2, row=4)
         self.Stock_Picking_Rad5.grid(column=2, row=5)
 
-        self.Stock_Picking_Search_Box = Entry(self, width=10)
+        self.Stock_Picking_Search_Box = Entry(self, width=25)
         self.Stock_Picking_Search_Box.grid(column=2, row=0)
 
         self.Stock_Picking_Search_Button = Button(self, font=("Arial", 12), fg='black', text="Buscar",
                                                   highlightbackground='black',
-                                                  command=lambda: self.Search_Stock_Picking(
-                                                      self.Stock_Picking_Search_Box.get()))
+                                                  command=lambda: self.Search_Stock_Picking(self.Stock_Picking_Search_Box.get()))
         self.Stock_Picking_Search_Button.grid(row=0, column=3, sticky="nsew")
 
-        self.Stock_Picking_Save_Button = Button(self, font=("Arial", 12), fg='black', text="Guardar",
-                                                highlightbackground='black',
-                                                command=lambda: models.execute_kw(db, uid, password, 'stock.picking',
-                                                                                  'write',
-                                                                                  [[int(self.document['id'])],
-                                                                                   {'state': selected.get()}]))
+        self.Stock_Picking_Save_Button = Button(self, state=DISABLED, font=("Arial", 12), fg='black', text="Guardar", highlightbackground='black',
+                            command=lambda: models.execute_kw(db, uid, password, 'stock.picking', 'write',
+                                                              [[int(self.document['id'])], {'state': selected.get()}]))
         self.Stock_Picking_Save_Button.grid(row=7, column=2, sticky="nsew")
 
     def Search_Stock_Picking(self, busqueda):
@@ -320,6 +328,14 @@ class Editor(Frame):
         self.document = self.document[-1]
         print(self.document)
 
+        if self.document['id'] != "":
+            self.Stock_Picking_Rad1['state'] = tkinter.NORMAL
+            self.Stock_Picking_Rad2['state'] = tkinter.NORMAL
+            self.Stock_Picking_Rad3['state'] = tkinter.NORMAL
+            self.Stock_Picking_Rad4['state'] = tkinter.NORMAL
+            self.Stock_Picking_Rad5['state'] = tkinter.NORMAL
+            self.Stock_Picking_Save_Button['state'] = tkinter.NORMAL
+
     def createWidgets(self):
         self.label.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
@@ -332,7 +348,7 @@ class Editor(Frame):
 
 Edit = Tk()
 Edit.title("Editor De ODOO")
-Edit.geometry('350x250')
+Edit.geometry('360x250')
 Edit.resizable(False, False)
 root = Editor(Edit).grid()
 Edit.mainloop()
