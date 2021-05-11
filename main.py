@@ -1,12 +1,13 @@
 import tkinter
 import xmlrpc.client
-from tkinter import *
+import tkinter as tk
+from tkinter import ttk
 from tkinter import messagebox
 
-db = 'soluciones-dev'
+db = 'soluciones'
 username = 'soluciones@bbinco.com'
 password = 'Bbinco1.0'
-url = 'https://soluciones-dev.odoo.com'
+url = 'https://soluciones.odoo.com'
 
 common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(url))
 uid = common.authenticate(db, username, password, {})
@@ -14,30 +15,53 @@ uid = common.authenticate(db, username, password, {})
 models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))
 
 
-class Editor(Frame):
+class Editor(tk.Frame):
     document = ""
     stock = False
     product = False
     purchase = False
+    sale = False
 
     def __init__(self, master, *args, **kwargs):
-        Frame.__init__(self, master, *args, **kwargs)
-        self.label = Label(self, font=("Arial", 24), relief=RAISED, justify=CENTER, bg='white', fg='black', borderwidth=0, text="      ")
-        self.stockButton = Button(self, font=("Arial", 12), fg='black', text="Inventario", highlightbackground='black',
-                                  command=lambda: self.Stock_Picking())
-        self.purchaseButton = Button(self, font=("Arial", 12), fg='black', text="Orden de Compra",
-                                     highlightbackground='black', command=lambda: self.Purchase_Order())
-        self.productButton = Button(self, font=("Arial", 12), fg='black', text="Productos", highlightbackground='black',
-                                    command=lambda: self.Pruduct_Template())
+        tk.Frame.__init__(self, master, *args, **kwargs)
+
+        self.Sale_Order_Search_Button = tk.Button(self, font=("Arial", 12), fg='black', text="Buscar",
+                                                  highlightbackground='black',
+                                                  command=lambda: self.Search_Sale_Order(
+                                                      self.Sale_Order_Search_Box.get()))
+        self.Sale_Order_Search_Box = tk.Entry(self, width=25)
+        self.bg = tk.PhotoImage(file="background2.png")
+        self.mylabel = tk.Label(Edit, image=self.bg)
+        self.stockButton = tk.Button(self, font=("Arial", 12), fg='black', text="Inventario",
+                                     highlightbackground='black',
+                                     command=lambda: self.Stock_Picking())
+        self.purchaseButton = tk.Button(self, font=("Arial", 12), fg='black', text="Orden de Compra",
+                                        highlightbackground='black', command=lambda: self.Purchase_Order())
+        self.productButton = tk.Button(self, font=("Arial", 12), fg='black', text="Productos",
+                                       highlightbackground='black',
+                                       command=lambda: self.Pruduct_Template())
+        self.saleButton = tk.Button(self, font=("Arial", 12), fg='black', text="Ventas", highlightbackground='black',
+                                    command=lambda: self.Sale_Order())
         self.parent = master
-        self.grid()
+        self.place()
         self.createWidgets()
 
     def Pruduct_Template(self):
         self.product = True
-        selected = StringVar()
+        selected = tk.StringVar()
         self.productButton['state'] = tkinter.DISABLED
 
+        if self.sale == True:
+            self.Sale_Order_Rad1.grid_remove()
+            self.Sale_Order_Rad2.grid_remove()
+            self.Sale_Order_Rad3.grid_remove()
+            self.Sale_Order_Rad4.grid_remove()
+            self.Sale_Order_Rad5.grid_remove()
+            self.Sale_Order_Search_Box.grid_remove()
+            self.Sale_Order_Search_Button.grid_remove()
+            self.Sale_Order_Save_Button.grid_remove()
+            self.sale = False
+            self.saleButton['state'] = tkinter.NORMAL
         if self.purchase == True:
             self.Purchase_Order_Rad1.grid_remove()
             self.Purchase_Order_Rad2.grid_remove()
@@ -50,7 +74,6 @@ class Editor(Frame):
             self.Purchase_Order_Rad6.grid_remove()
             self.purchase = False
             self.purchaseButton['state'] = tkinter.NORMAL
-
         if self.stock == True:
             self.Stock_Picking_Rad1.grid_remove()
             self.Stock_Picking_Rad2.grid_remove()
@@ -63,29 +86,33 @@ class Editor(Frame):
             self.stock = False
             self.stockButton['state'] = tkinter.NORMAL
 
-        self.Pruduct_Template_Rad1 = Radiobutton(self, state=DISABLED, text='Consumible', value="consu", variable=selected)
-        self.Pruduct_Template_Rad2 = Radiobutton(self, state=DISABLED, text='Servicio', value="service", variable=selected)
-        self.Pruduct_Template_Rad3 = Radiobutton(self, state=DISABLED, text='Almacenable', value="product", variable=selected)
+        self.Pruduct_Template_Rad1 = tk.Radiobutton(self, state=tk.DISABLED, text='Consumible', value="consu",
+                                                    variable=selected)
+        self.Pruduct_Template_Rad2 = tk.Radiobutton(self, state=tk.DISABLED, text='Servicio', value="service",
+                                                    variable=selected)
+        self.Pruduct_Template_Rad3 = tk.Radiobutton(self, state=tk.DISABLED, text='Almacenable', value="product",
+                                                    variable=selected)
 
         self.Pruduct_Template_Rad1.grid(column=2, row=1)
         self.Pruduct_Template_Rad2.grid(column=2, row=2)
         self.Pruduct_Template_Rad3.grid(column=2, row=3)
 
-        self.Pruduct_Template_Search_Box = Entry(self, width=25)
+        self.Pruduct_Template_Search_Box = tk.Entry(self, width=25)
         self.Pruduct_Template_Search_Box.grid(column=2, row=0)
 
-        self.Pruduct_Template_Search_Button = Button(self, font=("Arial", 12), fg='black', text="Buscar",
-                                                     highlightbackground='black',
-                                                     command=lambda: self.Search_Product(
-                                                         self.Pruduct_Template_Search_Box.get()))
+        self.Pruduct_Template_Search_Button = tk.Button(self, font=("Arial", 12), fg='black', text="Buscar",
+                                                        highlightbackground='black',
+                                                        command=lambda: self.Search_Product(
+                                                            self.Pruduct_Template_Search_Box.get()))
         self.Pruduct_Template_Search_Button.grid(row=0, column=3, sticky="nsew")
 
-        self.Pruduct_Template_Save_Button = Button(self, state=DISABLED, font=("Arial", 12), fg='black', text="Guardar",
-                                                   highlightbackground='black',
-                                                   command=lambda: models.execute_kw(db, uid, password,
-                                                                                     'product.template', 'write',
-                                                                                     [[int(self.document['id'])],
-                                                                                      {'type': selected.get()}]))
+        self.Pruduct_Template_Save_Button = tk.Button(self, state=tk.DISABLED, font=("Arial", 12), fg='black',
+                                                      text="Guardar",
+                                                      highlightbackground='black',
+                                                      command=lambda: models.execute_kw(db, uid, password,
+                                                                                        'product.template', 'write',
+                                                                                        [[int(self.document['id'])],
+                                                                                         {'type': selected.get()}]))
         self.Pruduct_Template_Save_Button.grid(row=7, column=2, sticky="nsew")
 
     def Search_Product(self, busqueda):
@@ -93,21 +120,34 @@ class Editor(Frame):
 
         self.document = models.execute_kw(db, uid, password, 'product.template', 'read', [ids], {'fields': ['id']})
 
-        self.document = self.document[-1]
-        print(self.document)
-        if self.document['id'] != "":
-            self.Pruduct_Template_Rad1['state'] = tkinter.NORMAL
-            self.Pruduct_Template_Rad2['state'] = tkinter.NORMAL
-            self.Pruduct_Template_Rad3['state'] = tkinter.NORMAL
-            self.Pruduct_Template_Save_Button['state'] = tkinter.NORMAL
+        try:
+            self.document = self.document[-1]
+            print(self.document)
+            self.Pruduct_Template_Rad1['state'] = tk.NORMAL
+            self.Pruduct_Template_Rad2['state'] = tk.NORMAL
+            self.Pruduct_Template_Rad3['state'] = tk.NORMAL
+            self.Pruduct_Template_Save_Button['state'] = tk.NORMAL
+        except:
+            messagebox.showerror(message="Producto No Encontrado", title="Error")
 
     def Purchase_Order(self):
-        selected = StringVar()
+        selected = tk.StringVar()
 
         self.purchase = True
 
-        self.purchaseButton['state'] = tkinter.DISABLED
+        self.purchaseButton['state'] = tk.DISABLED
 
+        if self.sale == True:
+            self.Sale_Order_Rad1.grid_remove()
+            self.Sale_Order_Rad2.grid_remove()
+            self.Sale_Order_Rad3.grid_remove()
+            self.Sale_Order_Rad4.grid_remove()
+            self.Sale_Order_Rad5.grid_remove()
+            self.Sale_Order_Search_Box.grid_remove()
+            self.Sale_Order_Search_Button.grid_remove()
+            self.Sale_Order_Save_Button.grid_remove()
+            self.sale = False
+            self.saleButton['state'] = tkinter.NORMAL
         if self.stock == True:
             self.Stock_Picking_Rad1.grid_remove()
             self.Stock_Picking_Rad2.grid_remove()
@@ -119,7 +159,6 @@ class Editor(Frame):
             self.Stock_Picking_Save_Button.grid_remove()
             self.stock = False
             self.stockButton['state'] = tkinter.NORMAL
-
         if self.product == True:
             self.Pruduct_Template_Rad1.grid_remove()
             self.Pruduct_Template_Rad2.grid_remove()
@@ -128,57 +167,83 @@ class Editor(Frame):
             self.Pruduct_Template_Search_Button.grid_remove()
             self.Pruduct_Template_Save_Button.grid_remove()
             self.product = False
-            self.productButton['state'] = tkinter.NORMAL
+            self.productButton['state'] = tk.NORMAL
 
-        self.Purchase_Order_Rad1 = Radiobutton(self, state=DISABLED, text='Borrador', value="draft", variable=selected)
-        self.Purchase_Order_Rad2 = Radiobutton(self, state=DISABLED, text='Solicitud de ppto.', value="sent", variable=selected)
-        self.Purchase_Order_Rad3 = Radiobutton(self, state=DISABLED, text='Para aprobar', value="to approve", variable=selected)
-        self.Purchase_Order_Rad4 = Radiobutton(self, state=DISABLED, text='Pedido de compra', value="purchase", variable=selected)
-        self.Purchase_Order_Rad5 = Radiobutton(self, state=DISABLED, text='Bloqueado', value="done", variable=selected)
-        self.Purchase_Order_Rad6 = Radiobutton(self, state=DISABLED, text='Cancelado', value="cancel", variable=selected)
+        self.Purchase_Order_Rad1 = tk.Radiobutton(self, state=tk.DISABLED, text='Borrador', value="draft",
+                                                  variable=selected)
+        self.Purchase_Order_Rad2 = tk.Radiobutton(self, state=tk.DISABLED, text='Solicitud de ppto.', value="sent",
+                                                  variable=selected)
+        self.Purchase_Order_Rad3 = tk.Radiobutton(self, state=tk.DISABLED, text='Para aprobar', value="to approve",
+                                                  variable=selected)
+        self.Purchase_Order_Rad4 = tk.Radiobutton(self, state=tk.DISABLED, text='Pedido de compra', value="purchase",
+                                                  variable=selected)
+        self.Purchase_Order_Rad5 = tk.Radiobutton(self, state=tk.DISABLED, text='Bloqueado', value="done",
+                                                  variable=selected)
+        self.Purchase_Order_Rad6 = tk.Radiobutton(self, state=tk.DISABLED, text='Cancelado', value="cancel",
+                                                  variable=selected)
 
         self.Purchase_Order_Rad1.grid(column=2, row=1)
         self.Purchase_Order_Rad2.grid(column=2, row=2)
         self.Purchase_Order_Rad3.grid(column=2, row=3)
         self.Purchase_Order_Rad4.grid(column=2, row=4)
         self.Purchase_Order_Rad5.grid(column=2, row=5)
-        self.Purchase_Order_Rad5.grid(column=2, row=6)
+        self.Purchase_Order_Rad6.grid(column=2, row=6)
 
-        self.Purchase_Order_Search_Box = Entry(self, width=25)
+        self.Purchase_Order_Search_Box = tk.Entry(self, width=25)
         self.Purchase_Order_Search_Box.grid(column=2, row=0)
 
-        self.Purchase_Order_Search_Button = Button(self, font=("Arial", 12), fg='black', text="Buscar",
-                                                   highlightbackground='black',
-                                                   command=lambda: self.Search_Purchase_Order(self.Purchase_Order_Search_Box.get()))
+        self.Purchase_Order_Search_Button = tk.Button(self, font=("Arial", 12), fg='black', text="Buscar",
+                                                      highlightbackground='black',
+                                                      command=lambda: self.Search_Purchase_Order(
+                                                          self.Purchase_Order_Search_Box.get()))
         self.Purchase_Order_Search_Button.grid(row=0, column=3, sticky="nsew")
 
-        self.Purchase_Order_Save_Button = Button(self, state=DISABLED, font=("Arial", 12), fg='black', text="Guardar",
-                                                 highlightbackground='black',
-                                                 command=lambda: models.execute_kw(db, uid, password, 'purchase.order', 'write', [[int(self.document['id'])], {'state': selected.get()}]))
+        self.Purchase_Order_Save_Button = tk.Button(self, state=tk.DISABLED, font=("Arial", 12), fg='black',
+                                                    text="Guardar",
+                                                    highlightbackground='black',
+                                                    command=lambda: models.execute_kw(db, uid, password,
+                                                                                      'purchase.order',
+                                                                                      'write',
+                                                                                      [[int(self.document['id'])],
+                                                                                       {'state': selected.get()}]))
         self.Purchase_Order_Save_Button.grid(row=7, column=2, sticky="nsew")
 
     def Search_Purchase_Order(self, busqueda):
         ids = models.execute_kw(db, uid, password, 'purchase.order', 'search', [[['name', '=', busqueda]]])
 
         self.document = models.execute_kw(db, uid, password, 'purchase.order', 'read', [ids], {'fields': ['id']})
-        print(self.document)
-        self.document = self.document[-1]
-        if self.document['id'] != "":
-            self.Purchase_Order_Rad1['state'] = tkinter.NORMAL
-            self.Purchase_Order_Rad2['state'] = tkinter.NORMAL
-            self.Purchase_Order_Rad3['state'] = tkinter.NORMAL
-            self.Purchase_Order_Rad4['state'] = tkinter.NORMAL
-            self.Purchase_Order_Rad5['state'] = tkinter.NORMAL
-            self.Purchase_Order_Rad6['state'] = tkinter.NORMAL
+
+        try:
+            self.document = self.document[-1]
+            print(self.document)
+            self.Purchase_Order_Rad1['state'] = tk.NORMAL
+            self.Purchase_Order_Rad2['state'] = tk.NORMAL
+            self.Purchase_Order_Rad3['state'] = tk.NORMAL
+            self.Purchase_Order_Rad4['state'] = tk.NORMAL
+            self.Purchase_Order_Rad5['state'] = tk.NORMAL
+            self.Purchase_Order_Rad6['state'] = tk.NORMAL
             self.Purchase_Order_Save_Button['state'] = tkinter.NORMAL
+        except:
+            messagebox.showerror(message="Orden De Compra No Encontrada", title="Error")
 
     def Stock_Picking(self):
-        selected = StringVar()
+        selected = tk.StringVar()
 
         self.stock = True
 
-        self.stockButton['state'] = tkinter.DISABLED
+        self.stockButton['state'] = tk.DISABLED
 
+        if self.sale == True:
+            self.Sale_Order_Rad1.grid_remove()
+            self.Sale_Order_Rad2.grid_remove()
+            self.Sale_Order_Rad3.grid_remove()
+            self.Sale_Order_Rad4.grid_remove()
+            self.Sale_Order_Rad5.grid_remove()
+            self.Sale_Order_Search_Box.grid_remove()
+            self.Sale_Order_Search_Button.grid_remove()
+            self.Sale_Order_Save_Button.grid_remove()
+            self.sale = False
+            self.saleButton['state'] = tk.NORMAL
         if self.purchase == True:
             self.Purchase_Order_Rad1.grid_remove()
             self.Purchase_Order_Rad2.grid_remove()
@@ -199,13 +264,17 @@ class Editor(Frame):
             self.Pruduct_Template_Search_Button.grid_remove()
             self.Pruduct_Template_Save_Button.grid_remove()
             self.product = False
-            self.productButton['state'] = tkinter.NORMAL
+            self.productButton['state'] = tk.NORMAL
 
-        self.Stock_Picking_Rad1 = Radiobutton(self, state=DISABLED, text='Borrador', value="draft", variable=selected)
-        self.Stock_Picking_Rad2 = Radiobutton(self, state=DISABLED, text='En Espera', value="confirmed", variable=selected)
-        self.Stock_Picking_Rad3 = Radiobutton(self, state=DISABLED, text='Preparado', value="assigned", variable=selected)
-        self.Stock_Picking_Rad4 = Radiobutton(self, state=DISABLED, text='Hecho', value="done", variable=selected)
-        self.Stock_Picking_Rad5 = Radiobutton(self, state=DISABLED, text='Cancelado', value="cancel", variable=selected)
+        self.Stock_Picking_Rad1 = tk.Radiobutton(self, state=tk.DISABLED, text='Borrador', value="draft",
+                                                 variable=selected)
+        self.Stock_Picking_Rad2 = tk.Radiobutton(self, state=tk.DISABLED, text='En Espera', value="confirmed",
+                                                 variable=selected)
+        self.Stock_Picking_Rad3 = tk.Radiobutton(self, state=tk.DISABLED, text='Preparado', value="assigned",
+                                                 variable=selected)
+        self.Stock_Picking_Rad4 = tk.Radiobutton(self, state=tk.DISABLED, text='Hecho', value="done", variable=selected)
+        self.Stock_Picking_Rad5 = tk.Radiobutton(self, state=tk.DISABLED, text='Cancelado', value="cancel",
+                                                 variable=selected)
 
         self.Stock_Picking_Rad1.grid(column=2, row=1)
         self.Stock_Picking_Rad2.grid(column=2, row=2)
@@ -213,17 +282,22 @@ class Editor(Frame):
         self.Stock_Picking_Rad4.grid(column=2, row=4)
         self.Stock_Picking_Rad5.grid(column=2, row=5)
 
-        self.Stock_Picking_Search_Box = Entry(self, width=25)
+        self.Stock_Picking_Search_Box = tk.Entry(self, width=25)
         self.Stock_Picking_Search_Box.grid(column=2, row=0)
 
-        self.Stock_Picking_Search_Button = Button(self, font=("Arial", 12), fg='black', text="Buscar",
-                                                  highlightbackground='black',
-                                                  command=lambda: self.Search_Stock_Picking(self.Stock_Picking_Search_Box.get()))
+        self.Stock_Picking_Search_Button = tk.Button(self, font=("Arial", 12), fg='black', text="Buscar",
+                                                     highlightbackground='black',
+                                                     command=lambda: self.Search_Stock_Picking(
+                                                         self.Stock_Picking_Search_Box.get()))
         self.Stock_Picking_Search_Button.grid(row=0, column=3, sticky="nsew")
 
-        self.Stock_Picking_Save_Button = Button(self, state=DISABLED, font=("Arial", 12), fg='black', text="Guardar", highlightbackground='black',
-                            command=lambda: models.execute_kw(db, uid, password, 'stock.picking', 'write',
-                                                              [[int(self.document['id'])], {'state': selected.get()}]))
+        self.Stock_Picking_Save_Button = tk.Button(self, state=tk.DISABLED, font=("Arial", 12), fg='black',
+                                                   text="Guardar",
+                                                   highlightbackground='black',
+                                                   command=lambda: models.execute_kw(db, uid, password, 'stock.picking',
+                                                                                     'write',
+                                                                                     [[int(self.document['id'])],
+                                                                                      {'state': selected.get()}]))
         self.Stock_Picking_Save_Button.grid(row=7, column=2, sticky="nsew")
 
     def Search_Stock_Picking(self, busqueda):
@@ -322,33 +396,122 @@ class Editor(Frame):
                                                                                                          'x_studio_cliente',
                                                                                                          'x_studio_direccin',
                                                                                                          'x_studio_related_field_qLMOV',
-                                                                                                         'x_studio_ciudad']
-                                                                                              })
+                                                                                                         'x_studio_ciudad']})
 
-        self.document = self.document[-1]
-        print(self.document)
-
-        if self.document['id'] != "":
+        try:
+            self.document = self.document[-1]
+            print(self.document)
             self.Stock_Picking_Rad1['state'] = tkinter.NORMAL
             self.Stock_Picking_Rad2['state'] = tkinter.NORMAL
             self.Stock_Picking_Rad3['state'] = tkinter.NORMAL
             self.Stock_Picking_Rad4['state'] = tkinter.NORMAL
             self.Stock_Picking_Rad5['state'] = tkinter.NORMAL
             self.Stock_Picking_Save_Button['state'] = tkinter.NORMAL
+        except:
+            print("No existe")
+            messagebox.showerror(message="Documento No Encontrado", title="Error")
+
+    def Sale_Order(self):
+
+        selected = tk.StringVar()
+
+        self.sale = True
+
+        self.saleButton['state'] = tkinter.DISABLED
+
+        if self.stock:
+            self.Stock_Picking_Rad1.grid_remove()
+            self.Stock_Picking_Rad2.grid_remove()
+            self.Stock_Picking_Rad3.grid_remove()
+            self.Stock_Picking_Rad4.grid_remove()
+            self.Stock_Picking_Rad5.grid_remove()
+            self.Stock_Picking_Search_Box.grid_remove()
+            self.Stock_Picking_Search_Button.grid_remove()
+            self.Stock_Picking_Save_Button.grid_remove()
+            self.stock = False
+            self.stockButton['state'] = tkinter.NORMAL
+        if self.purchase:
+            self.Purchase_Order_Rad1.grid_remove()
+            self.Purchase_Order_Rad2.grid_remove()
+            self.Purchase_Order_Rad3.grid_remove()
+            self.Purchase_Order_Rad4.grid_remove()
+            self.Purchase_Order_Rad5.grid_remove()
+            self.Purchase_Order_Rad6.grid_remove()
+            self.Purchase_Order_Search_Box.grid_remove()
+            self.Purchase_Order_Search_Button.grid_remove()
+            self.Purchase_Order_Save_Button.grid_remove()
+            self.purchase = False
+            self.purchaseButton['state'] = tkinter.NORMAL
+        if self.product:
+            self.Pruduct_Template_Rad1.grid_remove()
+            self.Pruduct_Template_Rad2.grid_remove()
+            self.Pruduct_Template_Rad3.grid_remove()
+            self.Pruduct_Template_Search_Box.grid_remove()
+            self.Pruduct_Template_Search_Button.grid_remove()
+            self.Pruduct_Template_Save_Button.grid_remove()
+            self.product = False
+            self.productButton['state'] = tkinter.NORMAL
+
+        self.Sale_Order_Rad1 = tk.Radiobutton(self, state=tk.DISABLED, text='Presupuesto', value="draft",
+                                              variable=selected)
+        self.Sale_Order_Rad2 = tk.Radiobutton(self, state=tk.DISABLED, text='Enviado', value="sent", variable=selected)
+        self.Sale_Order_Rad3 = tk.Radiobutton(self, state=tk.DISABLED, text='Pedido de Venta', value="sale",
+                                              variable=selected)
+        self.Sale_Order_Rad4 = tk.Radiobutton(self, state=tk.DISABLED, text='Bloqueado', value="done",
+                                              variable=selected)
+        self.Sale_Order_Rad5 = tk.Radiobutton(self, state=tk.DISABLED, text='Cancelado', value="cancel",
+                                              variable=selected)
+
+        self.Sale_Order_Rad1.grid(column=2, row=1)
+        self.Sale_Order_Rad2.grid(column=2, row=2)
+        self.Sale_Order_Rad3.grid(column=2, row=3)
+        self.Sale_Order_Rad4.grid(column=2, row=4)
+        self.Sale_Order_Rad5.grid(column=2, row=5)
+
+        self.Sale_Order_Search_Box.grid(column=2, row=0)
+
+        self.Sale_Order_Search_Button.grid(row=0, column=3, sticky="nsew")
+
+        self.Sale_Order_Save_Button = tk.Button(self, state=tk.DISABLED, font=("Arial", 12), fg='black', text="Guardar",
+                                                highlightbackground='black',
+                                                command=lambda: models.execute_kw(db, uid, password, 'sale.order',
+                                                                                  'write', [[int(self.document['id'])],
+                                                                                            {'state': selected.get()}]))
+        self.Sale_Order_Save_Button.grid(row=7, column=2, sticky="nsew")
+
+    def Search_Sale_Order(self, busqueda):
+        ids = models.execute_kw(db, uid, password, 'sale.order', 'search', [[['name', '=', busqueda]]])
+
+        self.document = models.execute_kw(db, uid, password, 'sale.order', 'read', [ids], {'fields': ['id']})
+
+        try:
+            self.document = self.document[-1]
+            print(self.document)
+            self.Sale_Order_Rad1['state'] = tk.NORMAL
+            self.Sale_Order_Rad2['state'] = tk.NORMAL
+            self.Sale_Order_Rad3['state'] = tk.NORMAL
+            self.Sale_Order_Rad4['state'] = tk.NORMAL
+            self.Sale_Order_Rad5['state'] = tk.NORMAL
+            self.Sale_Order_Save_Button['state'] = tk.NORMAL
+        except:
+            messagebox.showerror(message="Orden De Venta No Encontrada", title="Error")
 
     def createWidgets(self):
-        self.label.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
-        self.stockButton.grid(row=1, column=0, sticky="nsew")
+        self.stockButton.grid(column=0, row=1)
+        self.purchaseButton.grid(column=0, row=2)
+        self.productButton.grid(column=0, row=3)
+        self.saleButton.grid(column=0, row=4)
+        self.mylabel.place(x=0, y=0, relwidth=1, relheight=1)
+        self.mylabel.lower(self.stockButton)
 
-        self.purchaseButton.grid(row=2, column=0, sticky="nsew")
 
-        self.productButton.grid(row=3, column=0, sticky="nsew")
+Edit = tk.Tk()
+Edit.title("Editor De ODOO: BBINCO")
+Edit.geometry('720x407')
 
-
-Edit = Tk()
-Edit.title("Editor De ODOO")
-Edit.geometry('360x250')
+Edit.iconphoto(False, tk.PhotoImage(file='icon.png'))
 Edit.resizable(False, False)
-root = Editor(Edit).grid()
+root = Editor(Edit).place(x=0, y=0)
+
 Edit.mainloop()
